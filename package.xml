@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>o80_example</name>
+  <version>1.0.0</version>
+  <description>Example of o80 wrapping</description>
+  <author email="vincent.berenz@tuebingen.mpg.de">Vincent Berenz</author>
+  <maintainer email="vincent.berenz@tuebingen.mpg.de">Vincent Berenz</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>o80</build_depend>
+  <run_depend>o80</run_depend>
+
+  <export>
+  </export>
+</package>
