@@ -48,3 +48,16 @@ set_target_properties(o80_example_py PROPERTIES
 install(TARGETS o80_example_py DESTINATION ${CATKIN_GLOBAL_PYTHON_DESTINATION})
 
 
+##############
+# Unit tests #
+##############
+
+#
+# Note : these tests servers as o80 general unit tests,
+#        because o80 needs concrete instances to run
+#
+
+catkin_add_gtest(o80_unit_tests
+  tests/main.cpp
+  tests/unit_tests.cpp)
+target_link_libraries(o80_unit_tests o80_example ${catkin_libraries})

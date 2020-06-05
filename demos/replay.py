@@ -8,7 +8,7 @@ frontend = o80_example.FrontEnd(SEGMENT_ID)
 
 # replaying the last 5000 iterations
 # (i.e. last 5 seconds at 1000Hz backend frequency)
-current_iteration = frontend.read().get_iteration()
+current_iteration = frontend.latest().get_iteration()
 target_iteration = current_iteration-5000
 observations = frontend.get_observations_since(target_iteration)
 

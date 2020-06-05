@@ -25,7 +25,7 @@ trajectory = [ TrajectoryPoint(250,60),
 state = o80_example.State()
 
 # playing a trajectory on first joint
-starting_iteration = frontend.read().get_iteration()
+starting_iteration = frontend.latest().get_iteration()
 for tp in trajectory:
     state.set(tp.value)
     frontend.add_command(0,state,

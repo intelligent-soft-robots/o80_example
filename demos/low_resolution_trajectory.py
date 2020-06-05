@@ -8,7 +8,7 @@ SEGMENT_ID = "o80_example"
 frontend = o80_example.FrontEnd(SEGMENT_ID)
 
 
-initial_iteration = frontend.read().get_iteration()
+initial_iteration = frontend.latest().get_iteration()
 start_iteration = initial_iteration+1000
 
 state = o80_example.State()

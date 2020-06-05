@@ -16,13 +16,13 @@ def _get_plot(frontend):
     plt = fyplot.Plot(SEGMENT_ID,50,WINDOW)
     
     def get_joint1():
-        return frontend.read().get_desired_states().get(0).get()
+        return frontend.latest().get_desired_states().get(0).get()
     
     def get_joint2():
-        return frontend.read().get_desired_states().get(1).get()
+        return frontend.latest().get_desired_states().get(1).get()
 
     def get_frequency():
-        return frontend.read().get_frequency()
+        return frontend.latest().get_frequency()
     
     desired_states_plot = ( (get_joint1,(0,255,0)),
                             (get_joint2,(255,0,0)) )
@@ -37,13 +37,11 @@ def run():
 
     o80.clear_shared_memory(SEGMENT_ID)
 
-    print("1")
     o80_example.start_standalone(SEGMENT_ID,
                                  FREQUENCY,
                                  BURSTING_MODE,
                                  DRIVER_MIN,
                                  DRIVER_MAX)
-    print("2")
     
     frontend = o80_example.FrontEnd(SEGMENT_ID)
 

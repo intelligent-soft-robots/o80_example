@@ -22,7 +22,7 @@ trajectory = [ TrajectoryPoint(40,50,50),
 
 
 state = o80_example.State()
-print("starting at",frontend.read().get_iteration())
+print("starting at",frontend.latest().get_iteration())
 for tp in trajectory:
     state.set(tp.value1)
     frontend.add_command(0,state,
@@ -34,6 +34,6 @@ for tp in trajectory:
                          o80.Mode.QUEUE)
 
 frontend.pulse_and_wait()
-print("ending at",frontend.read().get_iteration())
+print("ending at",frontend.latest().get_iteration())
 
 

@@ -30,7 +30,7 @@ frontend.pulse()
 # the value of half the first
 time_start = time.time()
 while time.time()-time_start < 3:
-    obs = frontend.read()
+    obs = frontend.latest()
     value = obs.get_desired_states().get(0).get()/2.0
     state.set(value)
     frontend.add_command(1,state,
