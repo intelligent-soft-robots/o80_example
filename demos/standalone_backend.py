@@ -1,10 +1,10 @@
 import time
-import fyplot
 import o80
 import o80_example
+from fyplot import function_plot
 
 SEGMENT_ID = "o80_example"
-FREQUENCY = 1000
+FREQUENCY = 6000
 BURSTING_MODE = False
 DRIVER_MIN = 0.
 DRIVER_MAX = 100.
@@ -13,7 +13,7 @@ WINDOW = (1200,800)
 
 def _get_plot(frontend):
 
-    plt = fyplot.Plot(SEGMENT_ID,50,WINDOW)
+    plt = function_plot.Plot(SEGMENT_ID,50,WINDOW)
     
     def get_joint1():
         return frontend.latest().get_desired_states().get(0).get()

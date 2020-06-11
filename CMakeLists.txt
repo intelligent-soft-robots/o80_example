@@ -28,7 +28,7 @@ include_directories(include
 ################
 
 add_library( o80_example
-  src/joint.cpp
+#  src/joint.cpp
   src/action.cpp
   src/observation.cpp
   src/standalone.cpp
