@@ -14,7 +14,7 @@
 #include "o80_example/observation.hpp"
 #include "o80/front_end.hpp"
 #include "o80/observation.hpp"
-#include "o80/type.hpp"
+#include "o80/command_types.hpp"
 
 #include "real_time_tools/thread.hpp"
 
@@ -322,7 +322,7 @@ TEST_F(o80_tests, front_and_backends_basic)
     states.set(0, j0);
     states.set(1, j1);
 
-    for (int iter = 0; iter < 100; iter++)
+    for (int iter = 0; iter <= 100; iter++)
     {
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
     }
@@ -330,10 +330,12 @@ TEST_F(o80_tests, front_and_backends_basic)
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
         frontend.read();
     states = observation.get_desired_states();
-
+    long int iteration = observation.get_iteration();
+	
     j0 = states.get(0);
     j1 = states.get(1);
 
+    ASSERT_EQ(iteration,100);
     ASSERT_EQ(j0.value, 100);
     ASSERT_GT(j1.value, 100);
     ASSERT_LT(j1.value, 300);
@@ -341,7 +343,7 @@ TEST_F(o80_tests, front_and_backends_basic)
     frontend.add_command(
         1, o80_example::Joint(400), Iteration(400), Mode::QUEUE);
 
-    for (int iter = 100; iter < 300; iter++)
+    for (int iter = 101; iter <= 300; iter++)
     {
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
     }
@@ -355,7 +357,7 @@ TEST_F(o80_tests, front_and_backends_basic)
     ASSERT_EQ(j0.value, 200);
     ASSERT_EQ(j1.value, 300);
 
-    for (int iter = 300; iter < 400; iter++)
+    for (int iter = 301; iter <= 400; iter++)
     {
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
     }
@@ -408,6 +410,7 @@ TEST_F(o80_tests, front_and_backends_reapply)
     ASSERT_NE(iteration3, iteration4);
 }
 
+
 static std::atomic<bool> RUNNING(true);
 
 static void* frontend_wait_fn(void*)
@@ -439,15 +442,11 @@ TEST_F(o80_tests, frontend_wait)
     // that indeed the desired of the robot
     // is as expected
 
-  std::cout << "a\n";
-  
     RUNNING = true;
     clear_shared_memory("frontend_wait_utests");
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_fn);
-    usleep(5000);
-
-    std::cout << "b\n";
+    usleep(50000);
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -455,8 +454,6 @@ TEST_F(o80_tests, frontend_wait)
              o80::VoidExtendedState>
         frontend("frontend_wait_utests");
 
-  std::cout << "c\n";
-    
     frontend.add_command(
         0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
     frontend.add_command(
@@ -469,15 +466,11 @@ TEST_F(o80_tests, frontend_wait)
     frontend.add_command(
         1, o80_example::Joint(300), Iteration(300), Mode::QUEUE);
 
-  std::cout << "d\n";
-    
     TimePoint start = time_now();
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
         frontend.pulse_and_wait();
     TimePoint end = time_now();
 
-  std::cout << "e\n";
-    
     States<2, o80_example::Joint> states = observation.get_desired_states();
     o80_example::Joint j0 = states.get(0);
     o80_example::Joint j1 = states.get(1);
@@ -485,8 +478,6 @@ TEST_F(o80_tests, frontend_wait)
     RUNNING = false;
     thread.join();
 
-  std::cout << "f\n";
-    
     // false would mean did not wait
     long int duration = time_diff(start, end);
     ASSERT_GT(duration, 1000);
@@ -561,10 +552,11 @@ TEST_F(o80_tests, frontend_wait_for_next)
     clear_shared_memory("frontend_wait_utests");
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_low_freq_fn);
-    usleep(5000);
+    usleep(50000);
 
     for (int a = 0; a < 3; a++)
     {
+
         FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
                  o80_EXAMPLE_NB_DOFS,
                  o80_example::Joint,
@@ -587,6 +579,7 @@ TEST_F(o80_tests, frontend_wait_for_next)
             }
             iteration = iter;
         }
+
     }
 
     RUNNING = false;
@@ -707,7 +700,7 @@ TEST_F(o80_tests, frontend_burst)
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_standalone_fn);
 
-    usleep(50000);
+    usleep(500000);
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -746,8 +739,8 @@ TEST_F(o80_tests, frontend_burst)
     o80_example::Joint j2 = states2.get(0);
     o80_example::Joint j3 = states2.get(1);
 
-    ASSERT_EQ(iteration, 200);
-    ASSERT_EQ(iteration2, 350);
+    ASSERT_EQ(iteration, 199);
+    ASSERT_EQ(iteration2, 349);
 
     ASSERT_EQ(j0.value, 200);
     ASSERT_GT(j1.value, 100);
@@ -841,3 +834,4 @@ TEST_F(o80_tests, history)
 
     std::cout << "7\n";
 }
+
