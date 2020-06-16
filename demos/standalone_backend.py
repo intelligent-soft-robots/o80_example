@@ -4,7 +4,7 @@ import o80_example
 from fyplot import function_plot
 
 SEGMENT_ID = "o80_example"
-FREQUENCY = 6000
+FREQUENCY = 2000
 BURSTING_MODE = False
 DRIVER_MIN = 0.
 DRIVER_MAX = 100.

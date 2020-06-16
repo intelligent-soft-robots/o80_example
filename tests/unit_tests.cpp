@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <cstdlib>
 #include <set>
@@ -10,8 +9,8 @@
 #include "o80_example/joint.hpp"
 #include "o80_example/standalone.hpp"
 #include "o80_example/driver.hpp"
-#include "o80_example/action.hpp"
-#include "o80_example/observation.hpp"
+#include "o80_example/driver_in.hpp"
+#include "o80_example/driver_out.hpp"
 #include "o80/front_end.hpp"
 #include "o80/observation.hpp"
 #include "o80/command_types.hpp"
@@ -484,45 +483,6 @@ TEST_F(o80_tests, frontend_wait)
 
     ASSERT_EQ(j0.value, 200);
     ASSERT_EQ(j1.value, 300);
-}
-
-TEST_F(o80_tests, robot_interfaces_destructions)
-{
-    typedef o80_example::Action RiAction;
-    typedef o80_example::Driver RiDriver;
-    typedef std::shared_ptr<RiDriver> RiDriverPtr;
-    typedef robot_interfaces::SingleProcessRobotData<o80_example::Action,
-                                                     o80_example::Observation>
-        RiData;
-    typedef std::shared_ptr<RiData> RiDataPtr;
-    typedef robot_interfaces::RobotBackend<o80_example::Action,
-                                           o80_example::Observation>
-        RiBackend;
-    typedef robot_interfaces::RobotFrontend<o80_example::Action,
-                                            o80_example::Observation>
-        RiFrontend;
-
-    RiDataPtr data_ptr;
-    data_ptr.reset(new RiData());
-
-    RiDriverPtr driver_ptr;
-    driver_ptr.reset(new RiDriver(0, 1000));
-
-    RiFrontend frontend(data_ptr);
-
-    RiBackend* backend = new RiBackend(driver_ptr, data_ptr, false);
-
-    // backend->initialize();
-
-    RiAction action;
-    action.values[0] = 1;
-    action.values[1] = 2;
-    frontend.append_desired_action(action);
-
-    delete backend;
-    backend = nullptr;
-
-    usleep(1000);
 }
 
 static void* frontend_wait_low_freq_fn(void*)
