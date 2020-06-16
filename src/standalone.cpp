@@ -7,16 +7,15 @@ Standalone::Standalone(std::shared_ptr<Driver> driver_ptr,
                        std::string segment_id)
     : o80::Standalone<o80_EXAMPLE_QUEUE_SIZE,
                       2,
-                      Action,
-                      Observation,
+                      Driver,
                       Joint,
                       o80::VoidExtendedState>(driver_ptr, frequency, segment_id)
 {
 }
 
-Action Standalone::convert(const o80::States<2, Joint> &joints)
+DriverIn Standalone::convert(const o80::States<2, Joint> &joints)
 {
-    Action action;
+    DriverIn action;
     for (size_t dof = 0; dof < 2; dof++)
     {
         const Joint &joint = joints.get(dof);
@@ -27,7 +26,7 @@ Action Standalone::convert(const o80::States<2, Joint> &joints)
 
 // robot_interface observation and o80 observation
 // are the same thing
-o80::States<2, Joint> Standalone::convert(const Observation &observation)
+o80::States<2, Joint> Standalone::convert(const DriverOut &observation)
 {
     o80::States<2, Joint> states;
     states.set(0, Joint(observation.values[0]));
@@ -36,7 +35,7 @@ o80::States<2, Joint> Standalone::convert(const Observation &observation)
 }
 
 void Standalone::enrich_extended_state(o80::VoidExtendedState &extended_state,
-                                       const Observation &observation)
+                                       const DriverOut &observation)
 {
 }
 

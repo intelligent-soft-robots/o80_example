@@ -15,8 +15,7 @@ class Standalone
     : public o80::Standalone<o80_EXAMPLE_QUEUE_SIZE,  // Queue size
                              // for command passing
                              o80_EXAMPLE_NB_DOFS,  // 2 dofs robot
-                             Action,               // robot_interface action
-                             Observation,  //  robot_interface observation
+                             Driver,
                              Joint,        // o80 observation
                              o80::VoidExtendedState>  // no info on top of obs
 {
@@ -25,12 +24,12 @@ public:
                double frequency,
                std::string segment_id);
 
-    Action convert(const o80::States<2, Joint> &joints);
+    DriverIn convert(const o80::States<2, Joint> &joints);
 
-    o80::States<2, Joint> convert(const Observation &observation);
+    o80::States<2, Joint> convert(const DriverOut &driver_out);
 
     void enrich_extended_state(o80::VoidExtendedState &extended_state,
-                               const Observation &observation);
+                               const DriverOut &driver_out);
 };
 
 std::string get_segment_id(int id);

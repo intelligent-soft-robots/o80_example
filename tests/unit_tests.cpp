@@ -693,6 +693,92 @@ static void* bursting_standalone_fn(void*)
     standalone.stop();
 }
 
+
+TEST_F(o80_tests, frontend_one_burst)
+{
+    RUNNING = true;
+    clear_shared_memory("burst_unittests");
+    real_time_tools::RealTimeThread thread;
+    thread.create_realtime_thread(bursting_standalone_fn);
+
+    usleep(500000);
+
+    FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
+             o80_EXAMPLE_NB_DOFS,
+             o80_example::Joint,
+             o80::VoidExtendedState>
+        frontend("burst_unittests");
+    
+    frontend.add_command(
+        0, o80_example::Joint(100), Mode::QUEUE);
+    frontend.add_command(
+        1, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+
+    Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
+      frontend.burst(1); 
+    int iteration = observation.get_iteration();
+    States<2, o80_example::Joint> states = observation.get_desired_states();
+    o80_example::Joint j0 = states.get(0);
+    o80_example::Joint j1 = states.get(1);
+
+    ASSERT_EQ(iteration,0);
+    ASSERT_EQ(j0.value,100.0);
+    ASSERT_EQ(j1.value,1.0);
+
+    RUNNING = false;
+    frontend.final_burst();
+    thread.join();
+}
+
+
+TEST_F(o80_tests, relative_iteration_command)
+{
+    RUNNING = true;
+    clear_shared_memory("burst_unittests");
+    real_time_tools::RealTimeThread thread;
+    thread.create_realtime_thread(bursting_standalone_fn);
+
+    usleep(500000);
+
+    FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
+             o80_EXAMPLE_NB_DOFS,
+             o80_example::Joint,
+             o80::VoidExtendedState>
+        frontend("burst_unittests");
+    
+    frontend.add_command(
+        1, o80_example::Joint(100), Iteration(99), Mode::QUEUE);
+
+    Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
+      frontend.burst(100);
+    
+    States<2, o80_example::Joint> states = observation.get_desired_states();
+    o80_example::Joint j1 = states.get(1);
+
+    
+    ASSERT_EQ(observation.get_iteration(),99);
+    ASSERT_EQ(j1.value,100);
+
+    frontend.add_command(
+			 1, o80_example::Joint(200), Iteration(100,true,true),
+			 Mode::QUEUE);
+    observation =
+      frontend.burst(5);
+
+    states = observation.get_desired_states();
+    j1 = states.get(1);
+    
+    ASSERT_EQ(observation.get_iteration(),104);
+    ASSERT_EQ(j1.value,105.);
+    
+    RUNNING = false;
+    frontend.final_burst();
+    thread.join();
+}
+
+
+
+
 TEST_F(o80_tests, frontend_burst)
 {
     RUNNING = true;
@@ -707,7 +793,6 @@ TEST_F(o80_tests, frontend_burst)
              o80_example::Joint,
              o80::VoidExtendedState>
         frontend("burst_unittests");
-    frontend.add_command(0, o80_example::Joint(0), Mode::QUEUE);
     frontend.add_command(
         0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
     frontend.add_command(
@@ -724,7 +809,7 @@ TEST_F(o80_tests, frontend_burst)
         1, o80_example::Joint(300), Iteration(300), Mode::QUEUE);
 
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
-        frontend.burst(200);
+      frontend.burst(201); // running 201 iteration, i.e. reaching iteration number 200
     int iteration = observation.get_iteration();
 
     States<2, o80_example::Joint> states = observation.get_desired_states();
@@ -732,15 +817,15 @@ TEST_F(o80_tests, frontend_burst)
     o80_example::Joint j1 = states.get(1);
 
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation2 =
-        frontend.burst(150);
+      frontend.burst(150); // running 150 extra iterations, i.e. reaching iteration number 350
     int iteration2 = observation2.get_iteration();
 
     States<2, o80_example::Joint> states2 = observation2.get_desired_states();
     o80_example::Joint j2 = states2.get(0);
     o80_example::Joint j3 = states2.get(1);
 
-    ASSERT_EQ(iteration, 199);
-    ASSERT_EQ(iteration2, 349);
+    ASSERT_EQ(iteration, 200);
+    ASSERT_EQ(iteration2, 350);
 
     ASSERT_EQ(j0.value, 200);
     ASSERT_GT(j1.value, 100);
@@ -759,56 +844,48 @@ TEST_F(o80_tests, frontend_burst)
 TEST_F(o80_tests, history)
 {
 
-  std::cout << "1\n";
-  
     RUNNING = true;
     clear_shared_memory("burst_unittests");
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_standalone_fn);
 
-    usleep(50000);
+    usleep(500000);
 
-  std::cout << "2\n";
-    
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
              o80_example::Joint,
              o80::VoidExtendedState>
         frontend("burst_unittests");
 
-    std::cout << "3\n";
-    
     for (int i = 0; i < 100; i++)
     {
         frontend.add_command(0, o80_example::Joint(i), Mode::QUEUE);
     }
-    frontend.burst(120);
+    frontend.burst(121);
 
-    std::cout << "5\n";
-    
     long int newest = frontend.read().get_iteration();
-    ASSERT_EQ(newest, 120);
+    ASSERT_EQ(newest, 120); // iteration  number starting from 0
 
     typedef Observation<o80_EXAMPLE_NB_DOFS,
                         o80_example::Joint,
                         o80::VoidExtendedState>
         OBS;
 
-    std::vector<OBS> history1 = frontend.get_observations_since(90);
+    std::vector<OBS> history1 = frontend.get_observations_since(91);
     std::vector<OBS> history2 = frontend.get_latest_observations(30);
     ASSERT_EQ(history1.size(), 30);
     ASSERT_EQ(history2.size(), 30);
 
     std::array<std::vector<OBS>, 2> histories = {history1, history2};
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 9; i++)
     {
         for (const std::vector<OBS>& history : histories)
         {
             States<2, o80_example::Joint> states =
                 history[i].get_desired_states();
             o80_example::Joint j = states.get(0);
-            ASSERT_EQ(j.value, 90 + i);
+            ASSERT_EQ(j.value, 91 + i);
         }
     }
 
@@ -823,15 +900,10 @@ TEST_F(o80_tests, history)
         }
     }
 
-    std::cout << "5\n";
-
     RUNNING = false;
     frontend.final_burst();
-
-    std::cout << "6\n";
     
     thread.join();
 
-    std::cout << "7\n";
 }
 

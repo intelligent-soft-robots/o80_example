@@ -7,7 +7,7 @@ Driver::Driver(double min, double max) : min_(min), max_(max)
 }
 
 // at init dof are at min value
-void Driver::initialize()
+void Driver::start()
 {
     values_[0] = min_;
     values_[1] = min_;
@@ -15,43 +15,33 @@ void Driver::initialize()
 
 // just clip desired values
 // between 0 and 1000
-Action Driver::apply_action(const Action &desired_action)
+void Driver::set(const DriverIn &in)
 {
-    Action applied;
     for (unsigned int i = 0; i < 2; i++)
     {
-        if (desired_action.values[i] > max_)
+        if (in.values[i] > max_)
         {
-            applied.values[i] = max_;
+	  values_[i] = max_;
         }
-        else if (desired_action.values[i] < min_)
+        else if (in.values[i] < min_)
         {
-            applied.values[i] = min_;
+	  values_[i] = min_;
         }
         else
         {
-            applied.values[i] = desired_action.values[i];
+	  values_[i] = in.values[i];
         }
-        usleep(10);
-        values_[i] = applied.values[i];
     }
-    return applied;
 }
 
-Observation Driver::get_latest_observation()
+DriverOut Driver::get()
 {
-    Observation observation;
-    observation.values[0] = values_[0];
-    observation.values[1] = values_[1];
-    return observation;
+  DriverOut out;
+  out.values[0] = values_[0];
+  out.values[1] = values_[1];
+  return out;
 }
 
-void Driver::shutdown()
-{
-}
+  void Driver::stop(){}
 
-std::string Driver::get_error()
-{
-    return "";
-}
 }

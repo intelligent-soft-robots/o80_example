@@ -28,8 +28,8 @@ include_directories(include
 ################
 
 add_library( o80_example
-  src/driver_in.cpp
-  src/driver_out.cpp
+  src/action.cpp
+  src/observation.cpp
   src/standalone.cpp
   src/driver.cpp)
 target_link_libraries(o80_example ${catkin_LIBRARIES})

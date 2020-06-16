@@ -5,7 +5,7 @@
 
 namespace o80_example
 {
-class Observation
+class DriverOut
 {
 public:
     void print(bool endl);

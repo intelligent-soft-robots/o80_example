@@ -5,7 +5,7 @@
 
 namespace o80_example
 {
-class Action
+class DriverIn
 {
 public:
     void print(bool endl);
