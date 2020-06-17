@@ -1,6 +1,6 @@
 from functools import partial
 import time
-import fyplot
+from fyplot import function_plot
 import o80
 import o80_example
 
@@ -14,7 +14,7 @@ WINDOW = (1200,800)
 
 def _get_plot(frontend):
 
-    plt = fyplot.Plot(SEGMENT_ID,0.1,WINDOW)
+    plt = function_plot.Plot(SEGMENT_ID,0.1,WINDOW)
 
     class Iter:
         iteration = 0
