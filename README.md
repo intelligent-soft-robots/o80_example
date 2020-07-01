@@ -1,3 +1,4 @@
+[![continuous integration](https://raw.githubusercontent.com/MPI-IS-BambooAgent/sw_badges/master/badges/plans/o80pam/tag.svg?sanitize=true)](url)
 
 # What it is
 
