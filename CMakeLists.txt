@@ -60,3 +60,9 @@ catkin_add_gtest(o80_unit_tests
   tests/main.cpp
   tests/unit_tests.cpp)
 target_link_libraries(o80_unit_tests o80_example ${catkin_libraries})
+
+#################
+# Documentation #
+#################
+
+build_sphinx_documentation()
