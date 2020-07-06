@@ -1,4 +1,7 @@
-[![continuous integration](https://raw.githubusercontent.com/MPI-IS-BambooAgent/sw_badges/master/badges/plans/o80pam/tag.svg?sanitize=true)](url)
+[![build](https://raw.githubusercontent.com/MPI-IS-BambooAgent/sw_badges/master/badges/plans/o80/build.svg?sanitize=true)](url)
+[![documentation](https://raw.githubusercontent.com/MPI-IS-BambooAgent/sw_badges/master/badges/plans/o80/doc.svg?sanitize=true)](url)
+[![unit_tests](https://raw.githubusercontent.com/MPI-IS-BambooAgent/sw_badges/master/badges/plans/o80/unit%20tests.svg?sanitize=true)](url)
+
 
 # What it is
 
