@@ -13,10 +13,10 @@ namespace o80_example
 {
 class Standalone
     : public o80::Standalone<o80_EXAMPLE_QUEUE_SIZE,  // Queue size
-                             // for command passing
+                                                      // for command passing
                              o80_EXAMPLE_NB_DOFS,  // 2 dofs robot
                              Driver,
-                             Joint,        // o80 observation
+                             Joint,                   // o80 observation
                              o80::VoidExtendedState>  // no info on top of obs
 {
 public:
@@ -33,4 +33,4 @@ public:
 };
 
 std::string get_segment_id(int id);
-}
+}  // namespace o80_example

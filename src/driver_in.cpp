@@ -14,4 +14,4 @@ std::string DriverIn::to_string() const
 }
 
 double values[2];
-}
+}  // namespace o80_example

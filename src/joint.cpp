@@ -95,4 +95,4 @@ Joint Joint::intermediate_state(long int iteration_start,
                                              iteration);
     return Joint(desired);
 }
-}
+}  // namespace o80_example

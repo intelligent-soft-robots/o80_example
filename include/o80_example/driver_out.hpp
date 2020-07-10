@@ -11,4 +11,4 @@ public:
     void print(bool endl);
     double values[2];
 };
-}
+}  // namespace o80_example
