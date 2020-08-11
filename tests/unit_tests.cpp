@@ -6,14 +6,17 @@
 
 #include "o80/back_end.hpp"
 #include "o80/burster.hpp"
-#include "o80_example/joint.hpp"
-#include "o80_example/standalone.hpp"
+#include "o80/command_types.hpp"
+#include "o80/front_end.hpp"
+#include "o80/observation.hpp"
+#include "o80/state2d.hpp"
+#include "o80/state3d.hpp"
 #include "o80_example/driver.hpp"
 #include "o80_example/driver_in.hpp"
 #include "o80_example/driver_out.hpp"
-#include "o80/front_end.hpp"
-#include "o80/observation.hpp"
-#include "o80/command_types.hpp"
+#include "o80_example/joint.hpp"
+#include "o80_example/joint2d.hpp"
+#include "o80_example/standalone.hpp"
 
 #include "real_time_tools/thread.hpp"
 
@@ -36,6 +39,150 @@ class o80_tests : public ::testing::Test
         clear_memory();
     }
 };
+
+TEST_F(o80_tests, statexd_set_get)
+{
+    o80_example::Joint2d state(10.0, 20);
+
+    ASSERT_EQ(state.get<0>(), 10.0);
+    ASSERT_EQ(state.get<1>(), 20);
+
+    state.set<0>(100.0);
+    state.set<1>(200);
+
+    ASSERT_EQ(state.get<0>(), 100.0);
+    ASSERT_EQ(state.get<1>(), 200);
+}
+
+TEST_F(o80_tests, statexd)
+{
+    o80_example::Joint2d start_state(0, 0);
+    o80_example::Joint2d current_state(50, 50);
+    o80_example::Joint2d previous_desired_state(50, 50);
+    o80_example::Joint2d target_state(100, 100);
+
+    o80::TimePoint start(0);
+    o80::Speed speed = o80::Speed::per_second(50);
+
+    {
+        o80::TimePoint now(static_cast<long int>(1e9));
+        o80_example::Joint2d interpolated_state;
+        interpolated_state =
+            interpolated_state.intermediate_state(start,
+                                                  now,
+                                                  start_state,
+                                                  current_state,
+                                                  previous_desired_state,
+                                                  target_state,
+                                                  speed);
+        bool finished = interpolated_state.finished(start,
+                                                    now,
+                                                    start_state,
+                                                    current_state,
+                                                    previous_desired_state,
+                                                    target_state,
+                                                    speed);
+
+        ASSERT_EQ(interpolated_state.get<0>(), 50.0);
+        ASSERT_EQ(interpolated_state.get<1>(), 50);
+        ASSERT_EQ(finished, false);
+    }
+
+    {
+        o80::TimePoint now(static_cast<long int>(1.5e9));
+        o80_example::Joint2d interpolated_state;
+        interpolated_state =
+            interpolated_state.intermediate_state(start,
+                                                  now,
+                                                  start_state,
+                                                  current_state,
+                                                  previous_desired_state,
+                                                  target_state,
+                                                  speed);
+        bool finished = interpolated_state.finished(start,
+                                                    now,
+                                                    start_state,
+                                                    current_state,
+                                                    previous_desired_state,
+                                                    target_state,
+                                                    speed);
+
+        ASSERT_EQ(interpolated_state.get<0>(), 75.0);
+        ASSERT_EQ(interpolated_state.get<1>(), 75);
+        ASSERT_EQ(finished, false);
+    }
+
+    {
+        o80::TimePoint now(static_cast<long int>(2e9));
+        o80_example::Joint2d interpolated_state;
+        interpolated_state =
+            interpolated_state.intermediate_state(start,
+                                                  now,
+                                                  start_state,
+                                                  current_state,
+                                                  previous_desired_state,
+                                                  target_state,
+                                                  speed);
+        bool finished = interpolated_state.finished(start,
+                                                    now,
+                                                    start_state,
+                                                    current_state,
+                                                    previous_desired_state,
+                                                    target_state,
+                                                    speed);
+
+        ASSERT_EQ(interpolated_state.get<0>(), 100.0);
+        ASSERT_EQ(interpolated_state.get<1>(), 100);
+        ASSERT_EQ(finished, false);
+    }
+
+    {
+        o80::TimePoint now(static_cast<long int>(3e9));
+        o80_example::Joint2d interpolated_state;
+        interpolated_state =
+            interpolated_state.intermediate_state(start,
+                                                  now,
+                                                  start_state,
+                                                  current_state,
+                                                  previous_desired_state,
+                                                  target_state,
+                                                  speed);
+        bool finished = interpolated_state.finished(start,
+                                                    now,
+                                                    start_state,
+                                                    current_state,
+                                                    previous_desired_state,
+                                                    target_state,
+                                                    speed);
+
+        ASSERT_EQ(interpolated_state.get<0>(), 100.0);
+        ASSERT_EQ(interpolated_state.get<1>(), 100);
+        ASSERT_EQ(finished, true);
+    }
+}
+
+TEST_F(o80_tests, statexd_serialization)
+{
+    o80_example::Joint2d in(12.4, 5);
+
+    shared_memory::Serializer<o80_example::Joint2d> serializer;
+    const std::string& data = serializer.serialize(in);
+
+    o80_example::Joint2d out;
+    serializer.deserialize(data, out);
+
+    ASSERT_EQ(out.get<0>(), 12.4);
+    ASSERT_EQ(out.get<1>(), 5);
+}
+
+TEST_F(o80_tests, state2d_and_3d)
+{
+    o80::State2d state2d(1.0, 2.0);
+    o80::State3d state3d(1.0, 2.0, 3.0);
+
+    ASSERT_EQ(state2d.get<1>(), 2.0);
+    ASSERT_EQ(state3d.get<2>(), 3.0);
+}
 
 // check return false on too many commands
 TEST_F(o80_tests, command_status)
@@ -330,11 +477,11 @@ TEST_F(o80_tests, front_and_backends_basic)
         frontend.read();
     states = observation.get_desired_states();
     long int iteration = observation.get_iteration();
-	
+
     j0 = states.get(0);
     j1 = states.get(1);
 
-    ASSERT_EQ(iteration,100);
+    ASSERT_EQ(iteration, 100);
     ASSERT_EQ(j0.value, 100);
     ASSERT_GT(j1.value, 100);
     ASSERT_LT(j1.value, 300);
@@ -408,7 +555,6 @@ TEST_F(o80_tests, front_and_backends_reapply)
 
     ASSERT_NE(iteration3, iteration4);
 }
-
 
 static std::atomic<bool> RUNNING(true);
 
@@ -516,7 +662,6 @@ TEST_F(o80_tests, frontend_wait_for_next)
 
     for (int a = 0; a < 3; a++)
     {
-
         FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
                  o80_EXAMPLE_NB_DOFS,
                  o80_example::Joint,
@@ -539,7 +684,6 @@ TEST_F(o80_tests, frontend_wait_for_next)
             }
             iteration = iter;
         }
-
     }
 
     RUNNING = false;
@@ -653,7 +797,6 @@ static void* bursting_standalone_fn(void*)
     standalone.stop();
 }
 
-
 TEST_F(o80_tests, frontend_one_burst)
 {
     RUNNING = true;
@@ -668,28 +811,26 @@ TEST_F(o80_tests, frontend_one_burst)
              o80_example::Joint,
              o80::VoidExtendedState>
         frontend("burst_unittests");
-    
-    frontend.add_command(
-        0, o80_example::Joint(100), Mode::QUEUE);
+
+    frontend.add_command(0, o80_example::Joint(100), Mode::QUEUE);
     frontend.add_command(
         1, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
 
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
-      frontend.burst(1); 
+        frontend.burst(1);
     int iteration = observation.get_iteration();
     States<2, o80_example::Joint> states = observation.get_desired_states();
     o80_example::Joint j0 = states.get(0);
     o80_example::Joint j1 = states.get(1);
 
-    ASSERT_EQ(iteration,0);
-    ASSERT_EQ(j0.value,100.0);
-    ASSERT_EQ(j1.value,1.0);
+    ASSERT_EQ(iteration, 0);
+    ASSERT_EQ(j0.value, 100.0);
+    ASSERT_EQ(j1.value, 1.0);
 
     RUNNING = false;
     frontend.final_burst();
     thread.join();
 }
-
 
 TEST_F(o80_tests, relative_iteration_command)
 {
@@ -705,39 +846,33 @@ TEST_F(o80_tests, relative_iteration_command)
              o80_example::Joint,
              o80::VoidExtendedState>
         frontend("burst_unittests");
-    
+
     frontend.add_command(
         1, o80_example::Joint(100), Iteration(99), Mode::QUEUE);
 
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
-      frontend.burst(100);
-    
+        frontend.burst(100);
+
     States<2, o80_example::Joint> states = observation.get_desired_states();
     o80_example::Joint j1 = states.get(1);
 
-    
-    ASSERT_EQ(observation.get_iteration(),99);
-    ASSERT_EQ(j1.value,100);
+    ASSERT_EQ(observation.get_iteration(), 99);
+    ASSERT_EQ(j1.value, 100);
 
     frontend.add_command(
-			 1, o80_example::Joint(200), Iteration(100,true,true),
-			 Mode::QUEUE);
-    observation =
-      frontend.burst(5);
+        1, o80_example::Joint(200), Iteration(100, true, true), Mode::QUEUE);
+    observation = frontend.burst(5);
 
     states = observation.get_desired_states();
     j1 = states.get(1);
-    
-    ASSERT_EQ(observation.get_iteration(),104);
-    ASSERT_EQ(j1.value,105.);
-    
+
+    ASSERT_EQ(observation.get_iteration(), 104);
+    ASSERT_EQ(j1.value, 105.);
+
     RUNNING = false;
     frontend.final_burst();
     thread.join();
 }
-
-
-
 
 TEST_F(o80_tests, frontend_burst)
 {
@@ -769,7 +904,8 @@ TEST_F(o80_tests, frontend_burst)
         1, o80_example::Joint(300), Iteration(300), Mode::QUEUE);
 
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
-      frontend.burst(201); // running 201 iteration, i.e. reaching iteration number 200
+        frontend.burst(
+            201);  // running 201 iteration, i.e. reaching iteration number 200
     int iteration = observation.get_iteration();
 
     States<2, o80_example::Joint> states = observation.get_desired_states();
@@ -777,7 +913,8 @@ TEST_F(o80_tests, frontend_burst)
     o80_example::Joint j1 = states.get(1);
 
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation2 =
-      frontend.burst(150); // running 150 extra iterations, i.e. reaching iteration number 350
+        frontend.burst(150);  // running 150 extra iterations, i.e. reaching
+                              // iteration number 350
     int iteration2 = observation2.get_iteration();
 
     States<2, o80_example::Joint> states2 = observation2.get_desired_states();
@@ -803,7 +940,6 @@ TEST_F(o80_tests, frontend_burst)
 
 TEST_F(o80_tests, history)
 {
-
     RUNNING = true;
     clear_shared_memory("burst_unittests");
     real_time_tools::RealTimeThread thread;
@@ -824,7 +960,7 @@ TEST_F(o80_tests, history)
     frontend.burst(121);
 
     long int newest = frontend.read().get_iteration();
-    ASSERT_EQ(newest, 120); // iteration  number starting from 0
+    ASSERT_EQ(newest, 120);  // iteration  number starting from 0
 
     typedef Observation<o80_EXAMPLE_NB_DOFS,
                         o80_example::Joint,
@@ -862,8 +998,6 @@ TEST_F(o80_tests, history)
 
     RUNNING = false;
     frontend.final_burst();
-    
+
     thread.join();
-
 }
-

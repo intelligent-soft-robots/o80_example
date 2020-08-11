@@ -45,4 +45,4 @@ std::string get_segment_id(int id)
     segment_id = segment_id + std::string("_") + std::to_string(id);
     return segment_id;
 }
-}
+}  // namespace o80_example

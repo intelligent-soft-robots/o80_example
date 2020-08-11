@@ -21,27 +21,29 @@ void Driver::set(const DriverIn &in)
     {
         if (in.values[i] > max_)
         {
-	  values_[i] = max_;
+            values_[i] = max_;
         }
         else if (in.values[i] < min_)
         {
-	  values_[i] = min_;
+            values_[i] = min_;
         }
         else
         {
-	  values_[i] = in.values[i];
+            values_[i] = in.values[i];
         }
     }
 }
 
 DriverOut Driver::get()
 {
-  DriverOut out;
-  out.values[0] = values_[0];
-  out.values[1] = values_[1];
-  return out;
+    DriverOut out;
+    out.values[0] = values_[0];
+    out.values[1] = values_[1];
+    return out;
 }
 
-  void Driver::stop(){}
-
+void Driver::stop()
+{
 }
+
+}  // namespace o80_example
