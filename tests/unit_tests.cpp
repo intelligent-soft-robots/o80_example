@@ -182,6 +182,9 @@ TEST_F(o80_tests, state2d_and_3d)
 
     ASSERT_EQ(state2d.get<1>(), 2.0);
     ASSERT_EQ(state3d.get<2>(), 3.0);
+
+    state2d.set(3.0,4.0);
+    ASSERT_EQ(state2d.get<1>(), 4.0);
 }
 
 // check return false on too many commands
