@@ -9,6 +9,7 @@
 #include "o80/command_types.hpp"
 #include "o80/front_end.hpp"
 #include "o80/observation.hpp"
+#include "o80/sensor_state.hpp"
 #include "o80/state2d.hpp"
 #include "o80/state3d.hpp"
 #include "o80_example/driver.hpp"
@@ -26,6 +27,18 @@ static inline void clear_memory()
 {
     shared_memory::clear_shared_memory(o80_EXAMPLE_SEGMENT);
 }
+
+// class for testing sensor states
+class SensorStateTest : public o80::SensorState
+{
+public:
+  int value;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    archive(value);
+  }
+};
 
 class o80_tests : public ::testing::Test
 {
@@ -182,6 +195,13 @@ TEST_F(o80_tests, state2d_and_3d)
 
     ASSERT_EQ(state2d.get<1>(), 2.0);
     ASSERT_EQ(state3d.get<2>(), 3.0);
+}
+
+TEST_F(o80_tests, backend_sensor_state)
+{
+    clear_shared_memory("backend_sensor_state");
+    BackEnd<1000, 2, SensorStateTest, o80::VoidExtendedState> backend(
+        "backend_sensor_state");
 }
 
 // check return false on too many commands
