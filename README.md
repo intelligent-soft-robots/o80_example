@@ -5,7 +5,7 @@
 
 # What it is
 
-[o80](https://intelligent-soft-robots.github.io/code_documentation/o80/docs/sphinx/html/index.html) is a library for synchronization of c++ processes via custom Python APIs.
+[o80](https://intelligent-soft-robots.github.io/code_documentation/o80/docs/html/index.html) is a library for synchronization of c++ processes via custom Python APIs.
 
 This package shows a concrete implementation of o80, and also servers as a tutorial for its usage.
 

@@ -18,7 +18,7 @@ That you may get using pip3:
 
 >> catkin_tools, treep, fyplot, pyside2, empy
 
-You may install these dependencies using this [script](https://github.com/intelligent-soft-robots/o80/blob/master/o80_dependencies.)
+You may install these dependencies using this [script](https://github.com/intelligent-soft-robots/o80/blob/master/o80_dependencies)
 
 o80 has other catkin packages as dependencies. The rest of the documentation below will provide the instructions on how to clone them (with treep) and compile them (with catkin tools).
 
