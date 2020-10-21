@@ -1,14 +1,54 @@
 
 # Installation
 
-o80_example has been tested on Ubuntu 18.04 / c++11 / python3.
+o80_example has been tested on Ubuntu 18.04 / c++17 / python3.
 It uses [catkin tools](https://catkin-tools.readthedocs.io) for compilation.
 It requires several catkin packages, and uses [treep](https://pypi.org/project/treep/) as a project manager.
 
+## Overview : catkin tools
+
+We use catkin to build o80 and its related packages. Catkin is the build tool of [ROS](https://www.ros.org/),
+so if you worked with robots before, chances are good that you are already familiar with it.
+If not, please see [Creating a ROS package](wiki.ros.org/catkin/Tutorials/CreatingPackage).
+
+We are using [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/index.html) and build with Python 3
+(i.e. the python bindings will be created for python3).
+
+The typical workflow of working with catkin tools:
+
+```bash
+# creating a workspace
+mkdir -p workspace/src
+cd workspace/src
+# cloning packages in the workspace
+git clone <git url of package 1>
+git clone <git url of package 2>
+# ...
+# back to the workspace folder
+cd .. 
+# compiling, this above created the folder 'devel'
+catkin build 
+# 'sourcing' the workspace: this upgrades 
+# environmont variables such as 
+# $PATH, $PYTHONPATH, $LD_LIBRARY path
+source ./devel/setup.bash
+```
+The installation instructions below are based on a similar workflow.
+
+## Overview: treep
+
+In a typical catkin workflow, more than one repository needs to be cloned in the workspace.
+While it is possible to clone these repositories one by one, the installation procedure below uses
+treep to clone all the repos via a single command. A typical treep workflow is:
+
+- clone a treep configuration folder
+- call ```treep --clone PROJECT_NAME```
+
+The installation instructions below provides the git url to the correct treep configuration folder.
 
 ## Install the dependencies
 
-Here are the required dependencies for o80.
+Here are the required dependencies for o80 (including catkin and treep).
 
 That you may get using apt-get:
 
@@ -53,15 +93,24 @@ The treep configuration contains information about repositories to clone. See th
 treep --clone O80
 ```
 
-This will create a folder "workspace" and clone various catkin packges in it (including o80 and o80_example)
+This will create a folder "workspace" and clone various catkin packages in it (including o80 and o80_example)
 
 ## Compilation
 
 [catkin tools](https://catkin-tools.readthedocs.io/) is used for compilation:
 
+### if python3 is the default python (or you are using a python3 virtual environment):
+
+(you may call ```python --version``` to check your python version).
+
 ```bash
-# making sure python3, and not python2.7, is used
+catkin build
+
+```
+### if python3 is not the default python:
+
+```bash
 catkin config --cmake-args -DPYTHON_EXECUTABLE=/usr/bin/python3
-# compiling
 catkin build
 ```
+
