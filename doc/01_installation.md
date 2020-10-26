@@ -5,6 +5,11 @@ o80_example has been tested on Ubuntu 18.04 / c++17 / python3.
 It uses [catkin tools](https://catkin-tools.readthedocs.io) for compilation.
 It requires several catkin packages, and uses [treep](https://pypi.org/project/treep/) as a project manager.
 
+---
+You may also run the o80 demos using a docker installation.
+See the [demos](https://intelligent-soft-robots.github.io/code_documentation/o80_example/docs/html/doc/02_demos.html) documentation page.
+---
+
 ## Overview : catkin tools
 
 We use catkin to build o80 and its related packages. Catkin is the build tool of [ROS](https://www.ros.org/),
