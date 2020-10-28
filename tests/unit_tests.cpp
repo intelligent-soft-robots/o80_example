@@ -211,7 +211,6 @@ TEST_F(o80_tests, command_status)
 
     o80_example::Joint starting_state(200);
     o80_example::Joint target_state(100);
-    int starting_iteration = 1000;
     TimePoint start_time(10000);
     int current_iteration = 1001;
     TimePoint now(100001);
@@ -444,7 +443,7 @@ TEST_F(o80_tests, controllers_manager)
         executed_commands.insert(completed_commands[index]);
     }
 
-    ASSERT_EQ(executed_commands.size(), 4);
+    ASSERT_EQ(executed_commands.size(), (size_t)4);
 
     for (int id : ids)
     {
@@ -597,6 +596,8 @@ static void* frontend_wait_fn(void*)
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
         usleep(10);
     }
+    
+    return nullptr;
 }
 
 TEST_F(o80_tests, frontend_wait)
@@ -670,6 +671,8 @@ static void* frontend_wait_low_freq_fn(void*)
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
         usleep(10000);
     }
+
+    return nullptr;
 }
 
 TEST_F(o80_tests, frontend_wait_for_next)
@@ -745,6 +748,8 @@ static void* bursting_fn(void*)
         burster.pulse();
         iteration++;
     }
+
+    return nullptr;
 }
 
 TEST_F(o80_tests, burster)
@@ -815,6 +820,8 @@ static void* bursting_standalone_fn(void*)
     }
 
     standalone.stop();
+
+    return nullptr;
 }
 
 TEST_F(o80_tests, frontend_one_burst)
@@ -989,8 +996,8 @@ TEST_F(o80_tests, history)
 
     std::vector<OBS> history1 = frontend.get_observations_since(91);
     std::vector<OBS> history2 = frontend.get_latest_observations(30);
-    ASSERT_EQ(history1.size(), 30);
-    ASSERT_EQ(history2.size(), 30);
+    ASSERT_EQ(history1.size(), (size_t)30);
+    ASSERT_EQ(history2.size(), (size_t)30);
 
     std::array<std::vector<OBS>, 2> histories = {history1, history2};
 

@@ -28,8 +28,10 @@ public:
 
     o80::States<2, Joint> convert(const DriverOut &driver_out);
 
-    void enrich_extended_state(o80::VoidExtendedState &extended_state,
-                               const DriverOut &driver_out);
+    // optional user function for adding content to extended_state based
+    // on observation. Not needed for this example.
+    //void enrich_extended_state(o80::VoidExtendedState &extended_state,
+    //                           const DriverOut &driver_out);
 };
 
 std::string get_segment_id(int id);

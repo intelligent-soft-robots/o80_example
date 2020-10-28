@@ -1,69 +1,95 @@
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.10.2)
 
 project(o80_example)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
-find_package(catkin REQUIRED COMPONENTS o80)
-
-# defined in catkin_package mpi_cmake_modules,
-# used to detected for example if using real time computer,
-# also host various cmake files
-DEFINE_OS()
-
-catkin_package(
- LIBRARIES  o80_example
- INCLUDE_DIRS include
- CATKIN_DEPENDS
- o80
-)
-
-include_directories(include
-  example/include
-  ${catkin_INCLUDE_DIRS} )
-
-
 ################
-# Main Library #
+# Dependencies #
 ################
 
-add_library( o80_example
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(o80 REQUIRED)
+ament_export_dependencies(o80 )
+
+# prepare to export all needed targets
+set(all_targets)
+set(all_target_exports)
+
+
+###########
+# Library #
+###########
+
+add_library( ${PROJECT_NAME} SHARED
   src/driver_in.cpp
   src/driver_out.cpp
   src/standalone.cpp
-  src/driver.cpp)
-target_link_libraries(o80_example ${catkin_LIBRARIES})
+  src/driver.cpp )
+target_include_directories(
+  ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(${PROJECT_NAME} o80)
+target_link_libraries(${PROJECT_NAME} o80::o80)
+ament_export_interfaces(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+list(APPEND all_targets ${PROJECT_NAME})
+list(APPEND all_target_exports export_${PROJECT_NAME})
 
-###################################
-# Python bindings for the example #
-###################################
 
-pybind11_add_module(o80_example_py srcpy/wrappers.cpp)
-target_link_libraries(o80_example_py PRIVATE o80_example ${catkin_LIBRARIES})
-set_target_properties(o80_example_py PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}
-  OUTPUT_NAME o80_example
-  )
-install(TARGETS o80_example_py DESTINATION ${CATKIN_GLOBAL_PYTHON_DESTINATION})
+###################
+# Python wrappers #
+###################
+
+add_library(${PROJECT_NAME}_py MODULE srcpy/wrappers.cpp)
+target_link_libraries(${PROJECT_NAME}_py PRIVATE pybind11::module)
+target_link_libraries(${PROJECT_NAME}_py PRIVATE ${PYTHON_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_py PRIVATE ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME}_py
+                      PROPERTIES PREFIX "" SUFFIX "${PYTHON_MODULE_EXTENSION}")
+target_include_directories(
+  ${PROJECT_NAME}_py
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include> SYSTEM
+  PUBLIC ${PYTHON_INCLUDE_DIRS})
+_ament_cmake_python_get_python_install_dir()
+install(TARGETS ${PROJECT_NAME} DESTINATION ${PYTHON_INSTALL_DIR})
+
+
+#################
+# documentation #
+#################
+
+add_documentation()
+
+
+######################
+# Install and export #
+######################\
+
+install(DIRECTORY include/ DESTINATION include)
+install(
+  TARGETS ${all_targets}
+  EXPORT ${all_target_exports}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES
+  DESTINATION include)
+ament_package()
 
 
 ##############
 # Unit tests #
 ##############
 
-#
-# Note : these tests servers as o80 general unit tests,
-#        because o80 needs concrete instances to run
-#
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_${PROJECT_NAME}_cpp tests/main.cpp tests/unit_tests.cpp)
+  target_link_libraries(test_${PROJECT_NAME}_cpp ${PROJECT_NAME})
+endif()
 
-catkin_add_gtest(o80_unit_tests
-  tests/main.cpp
-  tests/unit_tests.cpp)
-target_link_libraries(o80_unit_tests o80_example ${catkin_libraries})
 
-#################
-# Documentation #
-#################
 
-build_sphinx_documentation()
+

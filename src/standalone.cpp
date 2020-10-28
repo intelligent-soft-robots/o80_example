@@ -34,10 +34,14 @@ o80::States<2, Joint> Standalone::convert(const DriverOut &observation)
     return states;
 }
 
+// optional user function for adding content to extended_state based
+// on observation. Not needed for this example.
+/*
 void Standalone::enrich_extended_state(o80::VoidExtendedState &extended_state,
                                        const DriverOut &observation)
 {
 }
+*/
 
 std::string get_segment_id(int id)
 {
