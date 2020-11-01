@@ -15,7 +15,9 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>o80</depend>
-
+  <depend>signal_handler</depend>
+  <depend>pybind11_vendor</depend>
+  
   <test_depend>ament_cmake_gtest</test_depend>
 
   <export>

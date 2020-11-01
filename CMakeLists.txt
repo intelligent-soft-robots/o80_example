@@ -12,7 +12,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(o80 REQUIRED)
-ament_export_dependencies(o80 )
+find_package(signal_handler REQUIRED)
+find_package(pybind11_vendor REQUIRED)
+find_package(pybind11 REQUIRED)
+ament_export_dependencies(o80 signal_handler pybind11)
 
 # prepare to export all needed targets
 set(all_targets)
@@ -47,14 +50,15 @@ target_link_libraries(${PROJECT_NAME}_py PRIVATE pybind11::module)
 target_link_libraries(${PROJECT_NAME}_py PRIVATE ${PYTHON_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}_py PRIVATE ${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME}_py
-                      PROPERTIES PREFIX "" SUFFIX "${PYTHON_MODULE_EXTENSION}")
+  PROPERTIES PREFIX "" SUFFIX "${PYTHON_MODULE_EXTENSION}"
+  OUTPUT_NAME ${PROJECT_NAME})
 target_include_directories(
   ${PROJECT_NAME}_py
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<INSTALL_INTERFACE:include> SYSTEM
   PUBLIC ${PYTHON_INCLUDE_DIRS})
 _ament_cmake_python_get_python_install_dir()
-install(TARGETS ${PROJECT_NAME} DESTINATION ${PYTHON_INSTALL_DIR})
+install(TARGETS ${PROJECT_NAME}_py DESTINATION ${PYTHON_INSTALL_DIR})
 
 
 #################
@@ -78,6 +82,13 @@ install(
   INCLUDES
   DESTINATION include)
 ament_package()
+
+
+#######################
+# Debian control file #
+#######################
+
+install(FILES debian/control DESTINATION debian)
 
 
 ##############

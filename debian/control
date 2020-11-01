@@ -1,0 +1,8 @@
+Package: o80
+Version: 1.00-1
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: libcereal-dev, libboost-all-dev, libeigen3-dev, libedit-dev, libncurses5-dev, freeglut3-dev, libxmu-dev
+Maintainer: Vincent Berenz <vberenz@tuebingen.mpg.de>
+Description: o80, see https://intelligent-soft-robots.github.io/code_documentation/o80/docs/html/index.html
