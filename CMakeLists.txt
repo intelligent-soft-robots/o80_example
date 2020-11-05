@@ -70,7 +70,7 @@ add_documentation()
 
 ######################
 # Install and export #
-######################\
+######################
 
 install(DIRECTORY include/ DESTINATION include)
 install(
