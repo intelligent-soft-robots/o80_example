@@ -15,7 +15,8 @@ find_package(o80 REQUIRED)
 find_package(signal_handler REQUIRED)
 find_package(pybind11_vendor REQUIRED)
 find_package(pybind11 REQUIRED)
-ament_export_dependencies(o80 signal_handler pybind11)
+find_package(Boost REQUIRED COMPONENTS filesystem system thread)
+ament_export_dependencies(Boost o80 signal_handler pybind11)
 
 # prepare to export all needed targets
 set(all_targets)
