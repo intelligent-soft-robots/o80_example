@@ -197,6 +197,27 @@ TEST_F(o80_tests, state2d_and_3d)
     ASSERT_EQ(state3d.get<2>(), 3.0);
 }
 
+TEST_F(o80_tests, observation_serialization)
+{
+  typedef o80::Observation<2,o80_example::Joint,o80::VoidExtendedState> Obs;
+  typedef o80::States<2,o80_example::Joint> Sta;
+  long int stamp = o80::time_now().count();
+  long int iteration = 5;
+  double frequency = 200.;
+  Sta sta;
+  Obs o1(sta,sta,stamp,iteration,frequency);
+  shared_memory::Serializer<Obs> serializer;
+  const std::string& data = serializer.serialize(o1);
+  Obs o2;
+  serializer.deserialize(data, o2);
+  ASSERT_EQ(o1.get_time_stamp(),stamp);
+  ASSERT_EQ(o2.get_time_stamp(),stamp);
+  ASSERT_EQ(o1.get_frequency(),frequency);
+  ASSERT_EQ(o2.get_frequency(),frequency);
+  ASSERT_EQ(o1.get_iteration(),iteration);
+  ASSERT_EQ(o2.get_iteration(),iteration);
+}
+
 TEST_F(o80_tests, backend_sensor_state)
 {
     clear_shared_memory("backend_sensor_state");
