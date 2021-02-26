@@ -633,7 +633,7 @@ TEST_F(o80_tests, frontend_wait)
     clear_shared_memory("frontend_wait_utests");
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_fn);
-    usleep(50000);
+    usleep(100000);
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -782,7 +782,7 @@ TEST_F(o80_tests, burster)
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_fn);
 
-    usleep(50000);
+    usleep(100000);
 
     shared_memory::set<int>("ut_burster", "nb_iterations", 0);
     o80::Burster::turn_on("ut_burster");
