@@ -641,17 +641,19 @@ TEST_F(o80_tests, frontend_wait)
              o80::VoidExtendedState>
         frontend("frontend_wait_utests");
 
+    iteration = frontend.latest().get_iteration();
+    
     frontend.add_command(
-        0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+        0, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
     frontend.add_command(
-        0, o80_example::Joint(200), Iteration(200), Mode::QUEUE);
+        0, o80_example::Joint(200), Iteration(iteration+200), Mode::QUEUE);
 
     frontend.add_command(
-        1, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+        1, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
 
-    frontend.add_command(1, o80_example::Joint(100), Mode::OVERWRITE);
+    frontend.add_command(1, o80_example::Joint(iteration+100), Mode::OVERWRITE);
     frontend.add_command(
-        1, o80_example::Joint(300), Iteration(300), Mode::QUEUE);
+        1, o80_example::Joint(300), Iteration(iteration+300), Mode::QUEUE);
 
     TimePoint start = time_now();
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
