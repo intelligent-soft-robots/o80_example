@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
+find_package(ament_cmake_nose REQUIRED)
 find_package(o80 REQUIRED)
 find_package(signal_handler REQUIRED)
 find_package(pybind11_vendor REQUIRED)
