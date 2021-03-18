@@ -641,7 +641,7 @@ TEST_F(o80_tests, frontend_wait)
              o80::VoidExtendedState>
         frontend("frontend_wait_utests");
 
-    iteration = frontend.latest().get_iteration();
+    long int iteration = frontend.pulse().get_iteration();
     
     frontend.add_command(
         0, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
