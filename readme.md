@@ -5,7 +5,7 @@
 
 This package shows a concrete example of o80 for controlling a toy robot.
 
-This documentation assumes you have been through [o80 documentation](https://intelligent-soft-robots.github.io/code_documentation/o80/docs/sphinx/html/index.html).
+This documentation assumes you have been through [o80 documentation](http://people.tuebingen.mpg.de/mpi-is-software/o80/docs/o80/index.html).
 
 # Author
 

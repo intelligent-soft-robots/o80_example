@@ -4,7 +4,7 @@ This section provides instructions on how to run the demos. Information on what 
 
 ## downloading the demos
 
-
+The git repository is [here](https://github.com/intelligent-soft-robots/o80_pam).
 
 
 ## running the non bursting mode demos
@@ -14,10 +14,7 @@ This section provides instructions on how to run the demos. Information on what 
 After sourcing the workspace, you may start a standalone:
 
 ```bash
-cd Software
-cd workspace
-source ./devel/setup.bash
-cd src/o80_example/demos
+cd o80_example/demos
 python3 ./standalone_backend.py
 ```
 
@@ -29,10 +26,7 @@ In  another terminal, run one of the demo, e.g. "duration_commands".
 
 
 ```bash
-cd Software
-cd workspace
-source ./devel/setup.bash
-cd src/o80_example/demos
+cd o80_example/demos
 python3 ./duration_commands.py
 ```
 
@@ -45,10 +39,7 @@ In the bursting mode, the standalone does not run at a specified frequency, rath
 ### starting a bursting standalone
 
 ```bash
-cd Software
-cd workspace
-source ./devel/setup.bash
-cd src/o80_example/demos
+cd o80_example/demos
 python3 ./standalone_backend_bursting.py
 ```
 
@@ -59,10 +50,7 @@ You should see a plot, showing the state values of the robot (now at 0).
 In another terminal:
 
 ```bash
-cd Software
-cd workspace
-source ./devel/setup.bash
-cd src/o80_example/demos
+cd o80_example/demos
 python3 ./bursting.py
 ```
 
