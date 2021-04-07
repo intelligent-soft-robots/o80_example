@@ -7,7 +7,7 @@ import o80_example
 from fyplot import function_plot
 
 SEGMENT_ID = "o80_example"
-FREQUENCY = 500
+FREQUENCY = 5000
 DRIVER_MIN = 0.
 DRIVER_MAX = 100.
 WINDOW = (1200,800)
