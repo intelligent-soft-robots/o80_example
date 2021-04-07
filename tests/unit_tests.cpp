@@ -32,12 +32,12 @@ static inline void clear_memory()
 class SensorStateTest : public o80::SensorState
 {
 public:
-  int value;
-  template <class Archive>
-  void serialize(Archive &archive)
-  {
-    archive(value);
-  }
+    int value;
+    template <class Archive>
+    void serialize(Archive& archive)
+    {
+        archive(value);
+    }
 };
 
 class o80_tests : public ::testing::Test
@@ -199,23 +199,23 @@ TEST_F(o80_tests, state2d_and_3d)
 
 TEST_F(o80_tests, observation_serialization)
 {
-  typedef o80::Observation<2,o80_example::Joint,o80::VoidExtendedState> Obs;
-  typedef o80::States<2,o80_example::Joint> Sta;
-  long int stamp = o80::time_now().count();
-  long int iteration = 5;
-  double frequency = 200.;
-  Sta sta;
-  Obs o1(sta,sta,stamp,iteration,frequency);
-  shared_memory::Serializer<Obs> serializer;
-  const std::string& data = serializer.serialize(o1);
-  Obs o2;
-  serializer.deserialize(data, o2);
-  ASSERT_EQ(o1.get_time_stamp(),stamp);
-  ASSERT_EQ(o2.get_time_stamp(),stamp);
-  ASSERT_EQ(o1.get_frequency(),frequency);
-  ASSERT_EQ(o2.get_frequency(),frequency);
-  ASSERT_EQ(o1.get_iteration(),iteration);
-  ASSERT_EQ(o2.get_iteration(),iteration);
+    typedef o80::Observation<2, o80_example::Joint, o80::VoidExtendedState> Obs;
+    typedef o80::States<2, o80_example::Joint> Sta;
+    long int stamp = o80::time_now().count();
+    long int iteration = 5;
+    double frequency = 200.;
+    Sta sta;
+    Obs o1(sta, sta, stamp, iteration, frequency);
+    shared_memory::Serializer<Obs> serializer;
+    const std::string& data = serializer.serialize(o1);
+    Obs o2;
+    serializer.deserialize(data, o2);
+    ASSERT_EQ(o1.get_time_stamp(), stamp);
+    ASSERT_EQ(o2.get_time_stamp(), stamp);
+    ASSERT_EQ(o1.get_frequency(), frequency);
+    ASSERT_EQ(o2.get_frequency(), frequency);
+    ASSERT_EQ(o1.get_iteration(), iteration);
+    ASSERT_EQ(o2.get_iteration(), iteration);
 }
 
 TEST_F(o80_tests, backend_sensor_state)
@@ -596,6 +596,45 @@ TEST_F(o80_tests, front_and_backends_reapply)
     ASSERT_NE(iteration3, iteration4);
 }
 
+TEST_F(o80_tests, backend_active)
+{
+    clear_shared_memory("f_a_bends_utests");
+    BackEnd<1000, 2, o80_example::Joint, o80::VoidExtendedState> backend(
+        "f_a_bends_utests");
+    FrontEnd<1000, 2, o80_example::Joint, o80::VoidExtendedState> frontend(
+        "f_a_bends_utests");
+    o80_example::Joint j0(0);
+    o80_example::Joint j1(0);
+
+    frontend.add_command(
+        0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+    frontend.add_command(
+        0, o80_example::Joint(200), Iteration(200), Mode::QUEUE);
+
+    frontend.add_command(
+        0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+    frontend.add_command(
+        0, o80_example::Joint(200), Iteration(300), Mode::QUEUE);
+
+    frontend.pulse();
+
+    States<2, o80_example::Joint> states;
+    states.set(0, j0);
+    states.set(1, j1);
+
+    for (int iter = 0; iter <= 300; iter++)
+    {
+        states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
+        ASSERT_TRUE(frontend.backend_is_active());
+    }
+
+    for (int iter = 0; iter <= 300; iter++)
+    {
+        states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
+        ASSERT_FALSE(frontend.backend_is_active());
+    }
+}
+
 static std::atomic<bool> RUNNING(true);
 
 static void* frontend_wait_fn(void*)
@@ -617,7 +656,7 @@ static void* frontend_wait_fn(void*)
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
         usleep(10);
     }
-    
+
     return nullptr;
 }
 
@@ -642,18 +681,19 @@ TEST_F(o80_tests, frontend_wait)
         frontend("frontend_wait_utests");
 
     long int iteration = frontend.pulse().get_iteration();
-    
-    frontend.add_command(
-        0, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
-    frontend.add_command(
-        0, o80_example::Joint(200), Iteration(iteration+200), Mode::QUEUE);
 
     frontend.add_command(
-        1, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
-
-    frontend.add_command(1, o80_example::Joint(iteration+100), Mode::OVERWRITE);
+        0, o80_example::Joint(100), Iteration(iteration + 100), Mode::QUEUE);
     frontend.add_command(
-        1, o80_example::Joint(300), Iteration(iteration+300), Mode::QUEUE);
+        0, o80_example::Joint(200), Iteration(iteration + 200), Mode::QUEUE);
+
+    frontend.add_command(
+        1, o80_example::Joint(100), Iteration(iteration + 100), Mode::QUEUE);
+
+    frontend.add_command(
+        1, o80_example::Joint(iteration + 100), Mode::OVERWRITE);
+    frontend.add_command(
+        1, o80_example::Joint(300), Iteration(iteration + 300), Mode::QUEUE);
 
     TimePoint start = time_now();
     Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
