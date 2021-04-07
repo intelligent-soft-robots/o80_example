@@ -4,5 +4,5 @@
 
 namespace o80_example
 {
-  typedef o80::StateXd<double, int> Joint2d;
+typedef o80::StateXd<double, int> Joint2d;
 }  // namespace o80_example

@@ -680,39 +680,88 @@ TEST_F(o80_tests, frontend_wait)
              o80::VoidExtendedState>
         frontend("frontend_wait_utests");
 
-    long int iteration = frontend.pulse().get_iteration();
+    for(int i=0;i<30;i++)
+      {
+    
+	long int iteration = frontend.pulse().get_iteration();
+    
+	frontend.add_command(
+			     0, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
+	frontend.add_command(
+			     0, o80_example::Joint(200), Iteration(iteration+200), Mode::QUEUE);
 
-    frontend.add_command(
-        0, o80_example::Joint(100), Iteration(iteration + 100), Mode::QUEUE);
-    frontend.add_command(
-        0, o80_example::Joint(200), Iteration(iteration + 200), Mode::QUEUE);
+	frontend.add_command(
+			     1, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
 
-    frontend.add_command(
-        1, o80_example::Joint(100), Iteration(iteration + 100), Mode::QUEUE);
+	frontend.add_command(1, o80_example::Joint(iteration+100), Mode::OVERWRITE);
+	frontend.add_command(
+			     1, o80_example::Joint(300), Iteration(iteration+300), Mode::QUEUE);
 
-    frontend.add_command(
-        1, o80_example::Joint(iteration + 100), Mode::OVERWRITE);
-    frontend.add_command(
-        1, o80_example::Joint(300), Iteration(iteration + 300), Mode::QUEUE);
+	TimePoint start = time_now();
+	Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
+	  frontend.pulse_and_wait();
+	TimePoint end = time_now();
 
-    TimePoint start = time_now();
-    Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
+	States<2, o80_example::Joint> states = observation.get_desired_states();
+	o80_example::Joint j0 = states.get(0);
+	o80_example::Joint j1 = states.get(1);
+
+	// false would mean did not wait
+	long int duration = time_diff(start, end);
+	ASSERT_GT(duration, 1000);
+	
+	ASSERT_EQ(j0.value, 200);
+	ASSERT_EQ(j1.value, 300);
+
+      }
+	
+    RUNNING = false;
+    thread.join();
+
+}
+
+TEST_F(o80_tests, frontend_wait_instant_command)
+{
+    // a backend runs in a separate threads.
+    // a frontend sends command, and
+    // wait for their completion. Then, checks
+    // that indeed the desired of the robot
+    // is as expected
+
+    RUNNING = true;
+    clear_shared_memory("frontend_wait_utests");
+    real_time_tools::RealTimeThread thread;
+    thread.create_realtime_thread(frontend_wait_fn);
+    usleep(100000);
+
+    FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
+	     o80_EXAMPLE_NB_DOFS,
+	       o80_example::Joint,
+	     o80::VoidExtendedState>
+      frontend("frontend_wait_utests");
+    
+    for(uint i=0;i<100;i++){
+
+      frontend.add_command(
+			   0, o80_example::Joint(100+i), Mode::QUEUE);
+      frontend.add_command(
+			   1, o80_example::Joint(100+i), Mode::QUEUE);
+
+      Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
         frontend.pulse_and_wait();
-    TimePoint end = time_now();
 
-    States<2, o80_example::Joint> states = observation.get_desired_states();
-    o80_example::Joint j0 = states.get(0);
-    o80_example::Joint j1 = states.get(1);
+      States<2, o80_example::Joint> states = observation.get_desired_states();
+      o80_example::Joint j0 = states.get(0);
+      o80_example::Joint j1 = states.get(1);
+
+      ASSERT_EQ(j0.value, 100+i);
+      ASSERT_EQ(j1.value, 100+i);
+      
+    }
 
     RUNNING = false;
     thread.join();
 
-    // false would mean did not wait
-    long int duration = time_diff(start, end);
-    ASSERT_GT(duration, 1000);
-
-    ASSERT_EQ(j0.value, 200);
-    ASSERT_EQ(j1.value, 300);
 }
 
 static void* frontend_wait_low_freq_fn(void*)
