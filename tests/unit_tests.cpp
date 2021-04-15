@@ -793,7 +793,7 @@ TEST_F(o80_tests, frontend_wait_for_next)
     clear_shared_memory("frontend_wait_utests");
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_low_freq_fn);
-    usleep(50000);
+    usleep(100000);
 
     for (int a = 0; a < 3; a++)
     {

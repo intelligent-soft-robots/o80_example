@@ -20,6 +20,18 @@ python3 ./standalone_backend.py
 
 A plot should appears. At the bottom, the frequency of the standalone is plotted. At the top, the values of the states of the robot are plotted (they should be at 0 for now).
 
+### starting introspection (optional)
+
+After starting the standalone, in another terminal:
+
+```bash
+cd o80_example/demos
+python3 ./introspection.py
+```
+
+This will result in the runtime display of the activity of the frontend and the backend. 
+
+
 ### running demos
 
 In  another terminal, run one of the demo, e.g. "duration_commands".
