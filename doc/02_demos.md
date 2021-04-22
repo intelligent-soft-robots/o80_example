@@ -2,16 +2,16 @@
 
 This section provides instructions on how to run the demos. Information on what these demos does is provided in following sections. 
 
-## downloading the demos
+## downloading the example repository
 
-The git repository is [here](https://github.com/intelligent-soft-robots/o80_pam).
+The git repository is [here](https://github.com/intelligent-soft-robots/o80_example.git).
 
 
 ## running the non bursting mode demos
 
 ### starting the o80 standalone
 
-After sourcing the workspace, you may start a standalone:
+You may start a standalone:
 
 ```bash
 cd o80_example/demos
