@@ -558,7 +558,6 @@ TEST_F(o80_tests, front_and_backends_basic)
     ASSERT_EQ(j1.value, 400);
 }
 
-
 TEST_F(o80_tests, purge)
 {
     clear_shared_memory("f_a_bends_utests");
@@ -598,7 +597,7 @@ TEST_F(o80_tests, purge)
     double v1 = states.get(1).value;
 
     frontend.purge();
-    
+
     for (int iter = 50; iter <= 300; iter++)
     {
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
@@ -606,9 +605,7 @@ TEST_F(o80_tests, purge)
 
     ASSERT_EQ(v0, states.get(0).value);
     ASSERT_EQ(v1, states.get(1).value);
-    
 }
-
 
 TEST_F(o80_tests, front_and_backends_reapply)
 {
@@ -732,44 +729,50 @@ TEST_F(o80_tests, frontend_wait)
              o80::VoidExtendedState>
         frontend("frontend_wait_utests");
 
-    for(int i=0;i<30;i++)
-      {
-    
-	long int iteration = frontend.pulse().get_iteration();
-    
-	frontend.add_command(
-			     0, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
-	frontend.add_command(
-			     0, o80_example::Joint(200), Iteration(iteration+200), Mode::QUEUE);
+    for (int i = 0; i < 30; i++)
+    {
+        long int iteration = frontend.pulse().get_iteration();
 
-	frontend.add_command(
-			     1, o80_example::Joint(100), Iteration(iteration+100), Mode::QUEUE);
+        frontend.add_command(0,
+                             o80_example::Joint(100),
+                             Iteration(iteration + 100),
+                             Mode::QUEUE);
+        frontend.add_command(0,
+                             o80_example::Joint(200),
+                             Iteration(iteration + 200),
+                             Mode::QUEUE);
 
-	frontend.add_command(1, o80_example::Joint(iteration+100), Mode::OVERWRITE);
-	frontend.add_command(
-			     1, o80_example::Joint(300), Iteration(iteration+300), Mode::QUEUE);
+        frontend.add_command(1,
+                             o80_example::Joint(100),
+                             Iteration(iteration + 100),
+                             Mode::QUEUE);
 
-	TimePoint start = time_now();
-	Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
-	  frontend.pulse_and_wait();
-	TimePoint end = time_now();
+        frontend.add_command(
+            1, o80_example::Joint(iteration + 100), Mode::OVERWRITE);
+        frontend.add_command(1,
+                             o80_example::Joint(300),
+                             Iteration(iteration + 300),
+                             Mode::QUEUE);
 
-	States<2, o80_example::Joint> states = observation.get_desired_states();
-	o80_example::Joint j0 = states.get(0);
-	o80_example::Joint j1 = states.get(1);
+        TimePoint start = time_now();
+        Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
+            frontend.pulse_and_wait();
+        TimePoint end = time_now();
 
-	// false would mean did not wait
-	long int duration = time_diff(start, end);
-	ASSERT_GT(duration, 1000);
-	
-	ASSERT_EQ(j0.value, 200);
-	ASSERT_EQ(j1.value, 300);
+        States<2, o80_example::Joint> states = observation.get_desired_states();
+        o80_example::Joint j0 = states.get(0);
+        o80_example::Joint j1 = states.get(1);
 
-      }
-	
+        // false would mean did not wait
+        long int duration = time_diff(start, end);
+        ASSERT_GT(duration, 1000);
+
+        ASSERT_EQ(j0.value, 200);
+        ASSERT_EQ(j1.value, 300);
+    }
+
     RUNNING = false;
     thread.join();
-
 }
 
 TEST_F(o80_tests, frontend_wait_instant_command)
@@ -787,33 +790,29 @@ TEST_F(o80_tests, frontend_wait_instant_command)
     usleep(100000);
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
-	     o80_EXAMPLE_NB_DOFS,
-	       o80_example::Joint,
-	     o80::VoidExtendedState>
-      frontend("frontend_wait_utests");
-    
-    for(uint i=0;i<100;i++){
+             o80_EXAMPLE_NB_DOFS,
+             o80_example::Joint,
+             o80::VoidExtendedState>
+        frontend("frontend_wait_utests");
 
-      frontend.add_command(
-			   0, o80_example::Joint(100+i), Mode::QUEUE);
-      frontend.add_command(
-			   1, o80_example::Joint(100+i), Mode::QUEUE);
+    for (uint i = 0; i < 100; i++)
+    {
+        frontend.add_command(0, o80_example::Joint(100 + i), Mode::QUEUE);
+        frontend.add_command(1, o80_example::Joint(100 + i), Mode::QUEUE);
 
-      Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
-        frontend.pulse_and_wait();
+        Observation<2, o80_example::Joint, o80::VoidExtendedState> observation =
+            frontend.pulse_and_wait();
 
-      States<2, o80_example::Joint> states = observation.get_desired_states();
-      o80_example::Joint j0 = states.get(0);
-      o80_example::Joint j1 = states.get(1);
+        States<2, o80_example::Joint> states = observation.get_desired_states();
+        o80_example::Joint j0 = states.get(0);
+        o80_example::Joint j1 = states.get(1);
 
-      ASSERT_EQ(j0.value, 100+i);
-      ASSERT_EQ(j1.value, 100+i);
-      
+        ASSERT_EQ(j0.value, 100 + i);
+        ASSERT_EQ(j1.value, 100 + i);
     }
 
     RUNNING = false;
     thread.join();
-
 }
 
 static void* frontend_wait_low_freq_fn(void*)
