@@ -558,6 +558,58 @@ TEST_F(o80_tests, front_and_backends_basic)
     ASSERT_EQ(j1.value, 400);
 }
 
+
+TEST_F(o80_tests, purge)
+{
+    clear_shared_memory("f_a_bends_utests");
+
+    BackEnd<1000, 2, o80_example::Joint, o80::VoidExtendedState> backend(
+        "f_a_bends_utests");
+    FrontEnd<1000, 2, o80_example::Joint, o80::VoidExtendedState> frontend(
+        "f_a_bends_utests");
+
+    o80_example::Joint j0(0);
+    o80_example::Joint j1(0);
+
+    frontend.add_command(
+        0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+    frontend.add_command(
+        0, o80_example::Joint(200), Iteration(200), Mode::QUEUE);
+
+    frontend.add_command(
+        1, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+
+    frontend.add_command(1, o80_example::Joint(100), Mode::OVERWRITE);
+    frontend.add_command(
+        1, o80_example::Joint(300), Iteration(300), Mode::QUEUE);
+
+    frontend.pulse();
+
+    States<2, o80_example::Joint> states;
+    states.set(0, j0);
+    states.set(1, j1);
+
+    for (int iter = 0; iter <= 50; iter++)
+    {
+        states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
+    }
+
+    double v0 = states.get(0).value;
+    double v1 = states.get(1).value;
+
+    frontend.purge();
+    
+    for (int iter = 50; iter <= 300; iter++)
+    {
+        states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
+    }
+
+    ASSERT_EQ(v0, states.get(0).value);
+    ASSERT_EQ(v1, states.get(1).value);
+    
+}
+
+
 TEST_F(o80_tests, front_and_backends_reapply)
 {
     clear_shared_memory("f_a_bends_utests");
