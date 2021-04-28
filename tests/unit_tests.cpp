@@ -597,20 +597,21 @@ TEST_F(o80_tests, initial_states)
     init_states.set(0, j0);
     init_states.set(1, j1);
 
-    
     for (int iter = 0; iter <= 100; iter++)
     {
         states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
     }
 
-    const States<2, o80_example::Joint>& recover_init_states = backend.initial_states();
-    
-    ASSERT_EQ(init_states.get(0).value,recover_init_states.get(0).value);
-    ASSERT_EQ(init_states.get(1).value,recover_init_states.get(1).value);
+    const States<2, o80_example::Joint>& recover_init_states =
+        backend.initial_states();
+    States<2, o80_example::Joint> frontend_init_states =
+        frontend.initial_states();
 
+    ASSERT_EQ(init_states.get(0).value, recover_init_states.get(0).value);
+    ASSERT_EQ(init_states.get(1).value, recover_init_states.get(1).value);
+    ASSERT_EQ(init_states.get(0).value, frontend_init_states.get(0).value);
+    ASSERT_EQ(init_states.get(1).value, frontend_init_states.get(1).value);
 }
-
-
 
 TEST_F(o80_tests, purge)
 {
