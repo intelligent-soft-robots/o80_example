@@ -558,6 +558,60 @@ TEST_F(o80_tests, front_and_backends_basic)
     ASSERT_EQ(j1.value, 400);
 }
 
+TEST_F(o80_tests, initial_states)
+{
+    // in this tests we have the frontends adding commands,
+    // we spin the backend so that it executes them,
+    // and we check using the frontend that the expected
+    // desired state are indeed produced.
+
+    clear_shared_memory("f_a_bends_utests");
+
+    BackEnd<1000, 2, o80_example::Joint, o80::VoidExtendedState> backend(
+        "f_a_bends_utests");
+    FrontEnd<1000, 2, o80_example::Joint, o80::VoidExtendedState> frontend(
+        "f_a_bends_utests");
+
+    o80_example::Joint j0(0);
+    o80_example::Joint j1(0);
+
+    frontend.add_command(
+        0, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+    frontend.add_command(
+        0, o80_example::Joint(200), Iteration(200), Mode::QUEUE);
+
+    frontend.add_command(
+        1, o80_example::Joint(100), Iteration(100), Mode::QUEUE);
+
+    frontend.add_command(1, o80_example::Joint(100), Mode::OVERWRITE);
+    frontend.add_command(
+        1, o80_example::Joint(300), Iteration(300), Mode::QUEUE);
+
+    frontend.pulse();
+
+    States<2, o80_example::Joint> states;
+    states.set(0, j0);
+    states.set(1, j1);
+
+    States<2, o80_example::Joint> init_states;
+    init_states.set(0, j0);
+    init_states.set(1, j1);
+
+    
+    for (int iter = 0; iter <= 100; iter++)
+    {
+        states = backend.pulse(TimePoint(0), states, o80::VoidExtendedState());
+    }
+
+    const States<2, o80_example::Joint>& recover_init_states = backend.initial_states();
+    
+    ASSERT_EQ(init_states.get(0).value,recover_init_states.get(0).value);
+    ASSERT_EQ(init_states.get(1).value,recover_init_states.get(1).value);
+
+}
+
+
+
 TEST_F(o80_tests, purge)
 {
     clear_shared_memory("f_a_bends_utests");
