@@ -10,8 +10,11 @@ In the demo, a toy "robot" has 2 actuators/joints. Each actuator being character
 To integrate a robot with o80, the following classes must be implemented:
 
 - a *Driver* class, which inherates o80::Driver, and templated over the user classes *DriverIn* and *DriverOut*. The driver class will be used by o80 for communicating with the robot.
+
 - a *State* class, possibly inherating from o80::State. This represents the state of an actuator.
+
 - an optional ExtendedState class, which encapsulates any robot sensory information that is not an actuator State.
+
 - a *Standalone* class, inherating from o80::Standalone, and templated over the Driver, the State and the ExtendedState.
 
 For these example, these classes have been implemented:
@@ -20,11 +23,16 @@ For these example, these classes have been implemented:
 
 The driver implements the code of the toy robot. Here the sources (code is trivial):
 
-- [driver.hpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/include/o80_example/driver.hpp) 
+- [driver.hpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/include/o80_example/driver.hpp)
+
 - [driver.cpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/src/driver.cpp)
+
 - [driver_in.hpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/include/o80_example/driver_in.hpp)
+
 - [driver_in.cpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/src/driver_in.cpp)
+
 - [driver_out.hpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/include/o80_example/driver_out.hpp)
+
 - [driver_out.cpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/src/driver_out.cpp)
 
 
@@ -35,6 +43,7 @@ o80 will call at runtime the set method of the driver to input values of desired
 An instance of the Joint class encapsulates the state of one actuator of the robot.
 
 - [joint.hpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/include/o80_example/joint.hpp)
+
 - [joint.cpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/src/joint.cpp)
 
 The code of Joint implements methods that specify how to interpolate from one desired state to another. These function will be called by the standalone when consuming for example "duration" commands (i.e. the standalone needs to interpolate from the current state value to the target state value over a specified duration). In this case, these methods are implemented in the [o80::State](https://github.com/intelligent-soft-robots/o80/blob/master/include/o80/state.hpp#L46) super class. The methods of the superclass supports only native type states (here a state is a double) with linear interpolation. For more complex states or interpolation method, the "intermediate_state" methods must be overriden.
@@ -53,11 +62,13 @@ Similarly to State, the ExtendedState class must implement a serialize method.
 An instance of Standalone is a "bridge" between the robot driver and the frontend. 
 
 - [standalone.hpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/include/o80_example/standalone.hpp)
+
 - [standalone.cpp](https://github.com/intelligent-soft-robots/o80_example/blob/master/src/standalone.cpp)
 
 The Standalone class inherates from o80::Standalone, templated over Driver, Joint and VoidExtendedState. Two more templates are provided:
 
 - QUEUE_SIZE (int): the size of the shared memories that will be used for exchanging commands and observations between frontends and backend. The bigger the number:
+
     - the more commands can be shared, i.e. full trajectories over a higher number of iterations can be specified
     - the bigger the available observation history (via o80::FrontEnd::get_latest_observations methods)
 
