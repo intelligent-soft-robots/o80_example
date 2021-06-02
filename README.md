@@ -6,7 +6,7 @@
 
 # What it is
 
-[o80](http://people.tuebingen.mpg.de/mpi-is-software/o80/docs/o80/index.html) is a library for synchronization of c++ processes via custom Python APIs.
+[o80](http://people.tuebingen.mpg.de/mpi-is-software/o80/docs/o80/index.html) is a library for synchronization of C++ processes via custom Python APIs.
 
 This package shows a concrete implementation of o80, and also servers as a tutorial for its usage.
 
