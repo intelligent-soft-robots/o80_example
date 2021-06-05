@@ -12,6 +12,7 @@
 #include "o80/sensor_state.hpp"
 #include "o80/state2d.hpp"
 #include "o80/state3d.hpp"
+#include "o80/state6d.hpp"
 #include "o80_example/driver.hpp"
 #include "o80_example/driver_in.hpp"
 #include "o80_example/driver_out.hpp"
@@ -195,6 +196,59 @@ TEST_F(o80_tests, state2d_and_3d)
 
     ASSERT_EQ(state2d.get<1>(), 2.0);
     ASSERT_EQ(state3d.get<2>(), 3.0);
+
+    double v = 5.0;
+    state3d.set<1>(v);
+
+    ASSERT_EQ(state3d.get<1>(),v);
+
+}
+
+TEST_F(o80_tests, state6d)
+{
+  o80::States<2,o80::State6d> states;
+
+  o80::State6d s1;
+  s1.set<0>(0);
+  s1.set<1>(1);
+  s1.set<2>(2);
+  s1.set<3>(3);
+  s1.set<4>(4);
+  s1.set<5>(5);
+  states.set(0,s1);
+
+  o80::State6d s2;
+  s2.set<0>(5);
+  s2.set<1>(5);
+  s2.set<2>(5);
+  s2.set<3>(5);
+  s2.set<4>(5);
+  s2.set<5>(5);
+  states.set(1,s2);
+
+  ASSERT_EQ(states.values[0].get<0>(),0);
+  ASSERT_EQ(states.values[0].get<4>(),4);
+  
+  ASSERT_EQ(states.values[1].get<2>(),5);
+  ASSERT_EQ(states.values[1].get<4>(),5);
+
+  states.values[0].set<1>(6);
+  states.values[1].set<4>(6);
+
+  ASSERT_EQ(states.values[0].get<1>(),6);
+  ASSERT_EQ(states.values[1].get<4>(),6);
+
+}
+
+TEST_F(o80_tests, state6d_set_get)
+{
+  double v1=5;
+  constexpr int nb_items = 10;
+  o80::States<nb_items,o80::State6d> states;
+  int index = 2;
+  states.values[index].set<0>(v1);
+  double v2 = states.values[index].get<0>();
+  ASSERT_EQ(v1,v2);
 }
 
 TEST_F(o80_tests, observation_serialization)
