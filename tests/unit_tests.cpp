@@ -803,6 +803,8 @@ static void* frontend_wait_fn(void*)
             o80::VoidExtendedState>
         backend("frontend_wait_utests");
 
+    shared_memory::set<bool>("backend_running","backend_running",true);
+    
     States<o80_EXAMPLE_NB_DOFS, o80_example::Joint> states;
     o80_example::Joint j0(0);
     o80_example::Joint j1(0);
@@ -828,9 +830,16 @@ TEST_F(o80_tests, frontend_wait)
 
     RUNNING = true;
     clear_shared_memory("frontend_wait_utests");
+    clear_shared_memory("backend_running");
+
+    bool backend_running=false;
+    shared_memory::set<bool>("backend_running","backend_running",backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_fn);
-    usleep(100000);
+    while (!backend_running)
+      {
+	shared_memory::get<bool>("backend_running","backend_running",backend_running);
+      }
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -894,9 +903,16 @@ TEST_F(o80_tests, frontend_wait_instant_command)
 
     RUNNING = true;
     clear_shared_memory("frontend_wait_utests");
+    clear_shared_memory("backend_running");
+    
+    bool backend_running=false;
+    shared_memory::set<bool>("backend_running","backend_running",backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_fn);
-    usleep(100000);
+    while (!backend_running)
+      {
+	shared_memory::get<bool>("backend_running","backend_running",backend_running);
+      }
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -932,6 +948,8 @@ static void* frontend_wait_low_freq_fn(void*)
             o80::VoidExtendedState>
         backend("frontend_wait_utests");
 
+    shared_memory::set<bool>("backend_running","backend_running",true);
+    
     States<o80_EXAMPLE_NB_DOFS, o80_example::Joint> states;
     o80_example::Joint j0(0);
     o80_example::Joint j1(0);
@@ -951,9 +969,16 @@ TEST_F(o80_tests, frontend_wait_for_next)
 {
     RUNNING = true;
     clear_shared_memory("frontend_wait_utests");
+    clear_shared_memory("backend_running");
+    
+    bool backend_running=false;
+    shared_memory::set<bool>("backend_running","backend_running",backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_low_freq_fn);
-    usleep(100000);
+    while (!backend_running)
+      {
+	shared_memory::get<bool>("backend_running","backend_running",backend_running);
+      }
 
     for (int a = 0; a < 3; a++)
     {
@@ -1012,6 +1037,8 @@ static void* bursting_fn(void*)
             o80::VoidExtendedState>
         backend("ut_burster");
 
+    shared_memory::set<bool>("backend_running","backend_running",true);
+
     o80::Burster burster("ut_burster");
     int iteration = 0;
     while (RUNNING)
@@ -1028,12 +1055,17 @@ TEST_F(o80_tests, burster)
 {
     o80::clear_shared_memory("ut_burster");
     o80::Burster::clear_memory("ut_burster");
+    clear_shared_memory("backend_running");
 
     RUNNING = true;
+    bool backend_running=false;
+    shared_memory::set<bool>("backend_running","backend_running",backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_fn);
-
-    usleep(100000);
+    while (!backend_running)
+      {
+	shared_memory::get<bool>("backend_running","backend_running",backend_running);
+      }
 
     shared_memory::set<int>("ut_burster", "nb_iterations", 0);
     o80::Burster::turn_on("ut_burster");
@@ -1081,9 +1113,10 @@ static void* bursting_standalone_fn(void*)
     std::shared_ptr<o80_example::Driver> driver =
         std::make_shared<o80_example::Driver>(0, 1000);
     o80_example::Standalone standalone(driver, frequency, "burst_unittests");
-
     standalone.start();
 
+    shared_memory::set<bool>("backend_running","backend_running",true);
+    
     bool bursting = true;
 
     while (RUNNING)
@@ -1100,10 +1133,16 @@ TEST_F(o80_tests, frontend_one_burst)
 {
     RUNNING = true;
     clear_shared_memory("burst_unittests");
+    clear_shared_memory("backend_running");
+
+    bool backend_running=false;
+    shared_memory::set<bool>("backend_running","backend_running",backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_standalone_fn);
-
-    usleep(500000);
+    while (!backend_running)
+      {
+	shared_memory::get<bool>("backend_running","backend_running",backend_running);
+      }
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
