@@ -5,6 +5,20 @@ project(o80_example VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+
+######################
+# Compile Definition #
+######################
+
+# the following file:
+# https://github.com/machines-in-motion/real_time_tools/blob/master/include/real_time_tools/thread.hpp
+# needs either NON_REAL_TIME or RT_PREEMPT to be defined 
+# "regular" OS
+add_compile_definitions(NON_REAL_TIME)
+# RT-Preempt OS
+#add_compile_definitions(RT_PREEMPT)
+
+
 ################
 # Dependencies #
 ################
