@@ -200,55 +200,53 @@ TEST_F(o80_tests, state2d_and_3d)
     double v = 5.0;
     state3d.set<1>(v);
 
-    ASSERT_EQ(state3d.get<1>(),v);
-
+    ASSERT_EQ(state3d.get<1>(), v);
 }
 
 TEST_F(o80_tests, state6d)
 {
-  o80::States<2,o80::State6d> states;
+    o80::States<2, o80::State6d> states;
 
-  o80::State6d s1;
-  s1.set<0>(0);
-  s1.set<1>(1);
-  s1.set<2>(2);
-  s1.set<3>(3);
-  s1.set<4>(4);
-  s1.set<5>(5);
-  states.set(0,s1);
+    o80::State6d s1;
+    s1.set<0>(0);
+    s1.set<1>(1);
+    s1.set<2>(2);
+    s1.set<3>(3);
+    s1.set<4>(4);
+    s1.set<5>(5);
+    states.set(0, s1);
 
-  o80::State6d s2;
-  s2.set<0>(5);
-  s2.set<1>(5);
-  s2.set<2>(5);
-  s2.set<3>(5);
-  s2.set<4>(5);
-  s2.set<5>(5);
-  states.set(1,s2);
+    o80::State6d s2;
+    s2.set<0>(5);
+    s2.set<1>(5);
+    s2.set<2>(5);
+    s2.set<3>(5);
+    s2.set<4>(5);
+    s2.set<5>(5);
+    states.set(1, s2);
 
-  ASSERT_EQ(states.values[0].get<0>(),0);
-  ASSERT_EQ(states.values[0].get<4>(),4);
-  
-  ASSERT_EQ(states.values[1].get<2>(),5);
-  ASSERT_EQ(states.values[1].get<4>(),5);
+    ASSERT_EQ(states.values[0].get<0>(), 0);
+    ASSERT_EQ(states.values[0].get<4>(), 4);
 
-  states.values[0].set<1>(6);
-  states.values[1].set<4>(6);
+    ASSERT_EQ(states.values[1].get<2>(), 5);
+    ASSERT_EQ(states.values[1].get<4>(), 5);
 
-  ASSERT_EQ(states.values[0].get<1>(),6);
-  ASSERT_EQ(states.values[1].get<4>(),6);
+    states.values[0].set<1>(6);
+    states.values[1].set<4>(6);
 
+    ASSERT_EQ(states.values[0].get<1>(), 6);
+    ASSERT_EQ(states.values[1].get<4>(), 6);
 }
 
 TEST_F(o80_tests, state6d_set_get)
 {
-  double v1=5;
-  constexpr int nb_items = 10;
-  o80::States<nb_items,o80::State6d> states;
-  int index = 2;
-  states.values[index].set<0>(v1);
-  double v2 = states.values[index].get<0>();
-  ASSERT_EQ(v1,v2);
+    double v1 = 5;
+    constexpr int nb_items = 10;
+    o80::States<nb_items, o80::State6d> states;
+    int index = 2;
+    states.values[index].set<0>(v1);
+    double v2 = states.values[index].get<0>();
+    ASSERT_EQ(v1, v2);
 }
 
 TEST_F(o80_tests, observation_serialization)
@@ -803,8 +801,8 @@ static void* frontend_wait_fn(void*)
             o80::VoidExtendedState>
         backend("frontend_wait_utests");
 
-    shared_memory::set<bool>("backend_running","backend_running",true);
-    
+    shared_memory::set<bool>("backend_running", "backend_running", true);
+
     States<o80_EXAMPLE_NB_DOFS, o80_example::Joint> states;
     o80_example::Joint j0(0);
     o80_example::Joint j1(0);
@@ -832,14 +830,16 @@ TEST_F(o80_tests, frontend_wait)
     clear_shared_memory("frontend_wait_utests");
     clear_shared_memory("backend_running");
 
-    bool backend_running=false;
-    shared_memory::set<bool>("backend_running","backend_running",backend_running);
+    bool backend_running = false;
+    shared_memory::set<bool>(
+        "backend_running", "backend_running", backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_fn);
     while (!backend_running)
-      {
-	shared_memory::get<bool>("backend_running","backend_running",backend_running);
-      }
+    {
+        shared_memory::get<bool>(
+            "backend_running", "backend_running", backend_running);
+    }
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -904,15 +904,17 @@ TEST_F(o80_tests, frontend_wait_instant_command)
     RUNNING = true;
     clear_shared_memory("frontend_wait_utests");
     clear_shared_memory("backend_running");
-    
-    bool backend_running=false;
-    shared_memory::set<bool>("backend_running","backend_running",backend_running);
+
+    bool backend_running = false;
+    shared_memory::set<bool>(
+        "backend_running", "backend_running", backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_fn);
     while (!backend_running)
-      {
-	shared_memory::get<bool>("backend_running","backend_running",backend_running);
-      }
+    {
+        shared_memory::get<bool>(
+            "backend_running", "backend_running", backend_running);
+    }
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
@@ -948,8 +950,8 @@ static void* frontend_wait_low_freq_fn(void*)
             o80::VoidExtendedState>
         backend("frontend_wait_utests");
 
-    shared_memory::set<bool>("backend_running","backend_running",true);
-    
+    shared_memory::set<bool>("backend_running", "backend_running", true);
+
     States<o80_EXAMPLE_NB_DOFS, o80_example::Joint> states;
     o80_example::Joint j0(0);
     o80_example::Joint j1(0);
@@ -970,15 +972,17 @@ TEST_F(o80_tests, frontend_wait_for_next)
     RUNNING = true;
     clear_shared_memory("frontend_wait_utests");
     clear_shared_memory("backend_running");
-    
-    bool backend_running=false;
-    shared_memory::set<bool>("backend_running","backend_running",backend_running);
+
+    bool backend_running = false;
+    shared_memory::set<bool>(
+        "backend_running", "backend_running", backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(frontend_wait_low_freq_fn);
     while (!backend_running)
-      {
-	shared_memory::get<bool>("backend_running","backend_running",backend_running);
-      }
+    {
+        shared_memory::get<bool>(
+            "backend_running", "backend_running", backend_running);
+    }
 
     for (int a = 0; a < 3; a++)
     {
@@ -1037,7 +1041,7 @@ static void* bursting_fn(void*)
             o80::VoidExtendedState>
         backend("ut_burster");
 
-    shared_memory::set<bool>("backend_running","backend_running",true);
+    shared_memory::set<bool>("backend_running", "backend_running", true);
 
     o80::Burster burster("ut_burster");
     int iteration = 0;
@@ -1058,14 +1062,16 @@ TEST_F(o80_tests, burster)
     clear_shared_memory("backend_running");
 
     RUNNING = true;
-    bool backend_running=false;
-    shared_memory::set<bool>("backend_running","backend_running",backend_running);
+    bool backend_running = false;
+    shared_memory::set<bool>(
+        "backend_running", "backend_running", backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_fn);
     while (!backend_running)
-      {
-	shared_memory::get<bool>("backend_running","backend_running",backend_running);
-      }
+    {
+        shared_memory::get<bool>(
+            "backend_running", "backend_running", backend_running);
+    }
 
     shared_memory::set<int>("ut_burster", "nb_iterations", 0);
     o80::Burster::turn_on("ut_burster");
@@ -1115,8 +1121,8 @@ static void* bursting_standalone_fn(void*)
     o80_example::Standalone standalone(driver, frequency, "burst_unittests");
     standalone.start();
 
-    shared_memory::set<bool>("backend_running","backend_running",true);
-    
+    shared_memory::set<bool>("backend_running", "backend_running", true);
+
     bool bursting = true;
 
     while (RUNNING)
@@ -1135,14 +1141,16 @@ TEST_F(o80_tests, frontend_one_burst)
     clear_shared_memory("burst_unittests");
     clear_shared_memory("backend_running");
 
-    bool backend_running=false;
-    shared_memory::set<bool>("backend_running","backend_running",backend_running);
+    bool backend_running = false;
+    shared_memory::set<bool>(
+        "backend_running", "backend_running", backend_running);
     real_time_tools::RealTimeThread thread;
     thread.create_realtime_thread(bursting_standalone_fn);
     while (!backend_running)
-      {
-	shared_memory::get<bool>("backend_running","backend_running",backend_running);
-      }
+    {
+        shared_memory::get<bool>(
+            "backend_running", "backend_running", backend_running);
+    }
 
     FrontEnd<o80_EXAMPLE_QUEUE_SIZE,
              o80_EXAMPLE_NB_DOFS,
