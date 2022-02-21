@@ -396,7 +396,7 @@ TEST_F(o80_tests, controllers_manager)
     typedef ControllersManager<2, o80_EXAMPLE_QUEUE_SIZE, o80_example::Joint>
         CM;
 
-    CM manager(segment_id);
+    CM manager(segment_id,-1);
     CM::CommandsTimeSeries& commands = manager.get_commands_time_series();
     CM::CompletedCommandsTimeSeries& completed_commands =
         manager.get_completed_commands_time_series();
