@@ -6,13 +6,13 @@ jobs:
   mypy:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install
         run: |
-          python3 -m pip install mypy types-PyYAML
+          python3 -m pip install mypy types-PyYAML types-toml nptyping
       - name: Add matcher
         run: |
           echo "::add-matcher::.github/workflows/mypy-problem-matcher.json"
